@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Virtual Environment
+.venv/
+env/
+ENV/
+venv/
+virtualenv/
+Virtualenv/
+virtualenv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+*.tmp
