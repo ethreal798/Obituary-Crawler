@@ -12,7 +12,7 @@ class Crawler:
     def fetch_list_page(self,start_offset):
         """获取列表页原始HTML"""
         data = {
-            'limit':10,
+            'limit':20,
             'category':CATEGORY_ID,
             'start':START_OFFSET
         }
