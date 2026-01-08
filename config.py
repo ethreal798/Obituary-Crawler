@@ -29,7 +29,7 @@ BATCH_STEP = 5
 START_OFFSET = 5
 END_OFFSET = 100
 
-# 并发控制 (后续异步用)
+# 最大并发线程数
 MAX_WORKERS = 10
 
 # 存储
