@@ -1,5 +1,11 @@
 import requests
-from config import HEADERS,COOKIES,CATEGORY_ID,START_OFFSET,LIST_API_URL,DETAIL_URL_TEMPLATE
+from config import HEADERS,COOKIES,CATEGORY_ID,START_OFFSET,LIST_API_URL,DETAIL_URL_TEMPLATE,STOP_AFTER_ATTEMPT
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type
+)
 
 class Crawler:
     def __init__(self):
@@ -23,6 +29,16 @@ class Crawler:
         resp.raise_for_status()
         return resp.text
 
+    @retry(
+        stop=stop_after_attempt(STOP_AFTER_ATTEMPT),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        retry=retry_if_exception_type((
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                requests.exceptions.HTTPError
+        )),
+        reraise=True
+    )
     def fetch_detail_page(self,post_id):
         """获取详情页原始HTML"""
         url = DETAIL_URL_TEMPLATE.format(post_id=post_id)

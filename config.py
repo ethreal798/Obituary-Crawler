@@ -34,3 +34,6 @@ MAX_WORKERS = 10
 
 # 存储
 OUTPUT_FILE = "obituaries.csv"
+
+#最大重试次数
+STOP_AFTER_ATTEMPT = 3
