@@ -1,10 +1,11 @@
 from crawler import Crawler
 from storage import CSVStorage
-from config import OUTPUT_FILE,START_OFFSET,END_OFFSET,BATCH_STEP,MAX_WORKERS
+from config import OUTPUT_FILE,START_OFFSET,END_OFFSET,BATCH_STEP,MAX_WORKERS,DETAIL_URL_TEMPLATE
 from parser import parse_list_page,parse_publish_time,parse_detail_page
 from utils import extract_post_id_from_url,random_delay
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+
 
 def fetch_single_detail(task_data):
     """使用多线程并行解析多个讣告页面"""
@@ -15,15 +16,19 @@ def fetch_single_detail(task_data):
         detail_html = crawler.fetch_detail_page(post_id)
         content = parse_detail_page(detail_html) if detail_html else ""
     except Exception as e:
-        print(f"❌ Detail failed for post={post_id}: {e}")
+        print(f"❌ Detail failed for post={post_id} ({type(e).__name__}): {e}")
         content = ""
-    
+    finally:
+        crawler.__del__()
+
+
+    URL = DETAIL_URL_TEMPLATE.format(post_id=post_id)
     pub_time = parse_publish_time(raw_time)
 
-    random_delay(0.3, 0.8)  # 可调小，因为已用 Session
+    random_delay(0.3, 0.8)
 
     return {
-        "URL": f"http://www.unitednews.net.ph/?post={post_id}",
+        "URL": URL,
         "Title": title,
         "Publish_Time": pub_time,
         "Content": content

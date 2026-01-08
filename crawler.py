@@ -1,13 +1,15 @@
 import requests
 from config import HEADERS,COOKIES,CATEGORY_ID,START_OFFSET,LIST_API_URL,DETAIL_URL_TEMPLATE
 
-
 class Crawler:
     def __init__(self):
         self.session = requests.session()
         self.session.headers.update(HEADERS)
         self.session.cookies.update(COOKIES)
         self.session.verify = False
+
+    def __del__(self):
+        self.session.close()
 
     def fetch_list_page(self,start_offset):
         """获取列表页原始HTML"""
@@ -24,6 +26,11 @@ class Crawler:
     def fetch_detail_page(self,post_id):
         """获取详情页原始HTML"""
         url = DETAIL_URL_TEMPLATE.format(post_id=post_id)
-        resp = self.session.get(url,params={"post":post_id},timeout=10)
-        resp.raise_for_status()
+        resp = self.session.get(url,timeout=(5,10))
+
+        if resp.status_code >= 500:
+            resp.raise_for_status() # 触发重试
+        elif resp.status_code>=400:
+            return ""
+
         return resp.text
