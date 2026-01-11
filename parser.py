@@ -1,11 +1,13 @@
 from datetime import datetime
 from lxml import html
+from logger import logger
 
 def parse_list_page(html_text):
     """解析列表页，返回（urls,titles,times）"""
     try:
         doc = html.fromstring(html_text)
     except Exception as e:
+        logger.error(f"Failed to parse list page: {e}")
         raise ValueError(f"Failed to parse list page:{e}")
 
     urls = doc.xpath("//a/@href")
@@ -14,6 +16,7 @@ def parse_list_page(html_text):
 
     # 对齐长度
     min_len = min(len(urls), len(titles), len(raw_times))
+    logger.info(f"Found {min_len} items in list page")
     return urls[:min_len], titles[:min_len], raw_times[:min_len]
 
 def parse_detail_page(html_text):
@@ -26,11 +29,13 @@ def parse_detail_page(html_text):
         )
         return ''.join(content_nodes).strip()
     except Exception as e:
+        logger.error(f"Failed to parse detail page: {e}")
         raise ValueError(f"Failed to parse detail page:{e}")
 
 def parse_publish_time(raw_time_str):
     """解析 'December 16, 2025' 格式日期"""
     try:
         return datetime.strptime(raw_time_str,"%B %d, %Y")
-    except ValueError:
+    except ValueError as e:
+        logger.warning(f"Failed to parse date '{raw_time_str}': {e}")
         return None

@@ -1,4 +1,5 @@
 import requests
+from logger import logger
 from config import HEADERS,COOKIES,CATEGORY_ID,START_OFFSET,LIST_API_URL,DETAIL_URL_TEMPLATE,STOP_AFTER_ATTEMPT
 from tenacity import (
     retry,
@@ -45,8 +46,10 @@ class Crawler:
         resp = self.session.get(url,timeout=(5,10))
 
         if resp.status_code >= 500:
+            logger.warning(f"Server error {resp.status_code} for post_id {post_id}")
             resp.raise_for_status() # 触发重试
         elif resp.status_code>=400:
+            logger.debug(f"Client error {resp.status_code} for post_id {post_id}, returning empty")
             return ""
 
         return resp.text
